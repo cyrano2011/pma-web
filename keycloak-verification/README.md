@@ -8,7 +8,10 @@
 | 검증 대상 | Keycloak **26.4.7** (`quay.io/keycloak/keycloak:26.4`, `start-dev`) |
 | 검증일 | 2026-08-17 |
 | 방법 | ① 콘솔이 호출하는 것과 동일한 Admin REST 로 전 단계 수행 + assert (`verify.sh`) <br> ② 실제 admin console 을 Chromium 으로 조작해 화면/라벨 확인 (`console-checks.mjs`) |
-| 결과 | REST 검증 **23/23 PASS**, 콘솔 화면 검증 **33/33 PASS** |
+| 결과 | REST 검증 **23/23 PASS**, 콘솔 화면 검증 **33/33 PASS**, 수정본 가이드 콘솔 e2e **30/30 PASS** |
+
+**수정본 가이드: [`kcconsoleguide-revised.md`](kcconsoleguide-revised.md)** — 아래 지적을 모두 반영한 판이며,
+빈 Keycloak 에서 그 문서대로 콘솔을 클릭해 전 단계를 수행하는 e2e(`console-run.mjs`)로 다시 검증했다(30/30 PASS).
 
 **결론: 절차 자체는 동작한다.** 1~6단계를 그대로 밟으면 `business` 클레임이 액세스 토큰에
 문자열로 실리고, 기존 계정의 비밀번호 로그인도 깨지지 않는다.
@@ -116,16 +119,50 @@ Attribute search  business=CHEONAN → 1건
 - `.env.prod` 의 `KEY_CLOAK_CLIENT_ID` = `itgrims-client` 인지, enforce 플래그가 이미지에 구워지는지
 - prod/staging 콘솔 URL, staging 비밀번호 리셋 이력
 
-## 5. 재현 방법
+## 5. 수정본 가이드를 콘솔에서 그대로 수행한 재검증
+
+`kcconsoleguide-revised.md` 의 0~6단계를 **admin console 에서 실제로 클릭해** 수행하고 결과를 확인했다
+(`console-run.mjs`). 그룹 생성, User Profile 속성 선언(validator 포함), 전용 스코프 매퍼 생성,
+계정별 값 선택과 그룹 가입, 서비스 계정 처리, Evaluate 확인, Attribute search 집계까지 전부 화면 조작이다.
+
+```
+0 단계 2/2 · 1 단계 1/1 · 2 단계 5/5 · 3 단계 4/4 · 4 단계 5/5 · 5 단계 8/8 · 6 단계 5/5
+→ PASS 30 / FAIL 0
+```
+
+이 과정에서 **원본에는 없던 화면 차이 3건**을 추가로 찾아 수정본에 반영했다.
+
+| # | 원본/1차 수정본 | 실제 화면 |
+|---|---|---|
+| 11 | 3단계 `Add mapper → By configuration` | 매퍼가 하나도 없는 전용 스코프에는 그 드롭다운이 없다. 빈 화면의 **`Configure a new mapper`** 버튼으로 들어간다 |
+| 12 | 3단계 `User Attribute: business` (입력값처럼 서술) | 자유 입력이 아니라 **User Profile 선언 속성 드롭다운**. 2단계를 먼저 끝내야 목록에 나온다. `Claim JSON Type` 은 기본값이 이미 `String` |
+| 13 | 4단계 "값을 넣고 Save" | 콘솔로 `options` validator 를 넣으면 `annotations.inputType=select` 가 자동으로 붙어 **`사업 구분` 이 드롭다운**이 된다. 콘솔 경로에서는 오타 자체가 불가능하고, 오타 차단(400)은 REST 경로에서 확인됨 |
+
+![수정본대로 콘솔에서 만든 결과 — 사업 구분 드롭다운](screenshots/s4-business-select.png)
+
+## 6. 재현 방법
 
 ```bash
 cd keycloak-verification
-./verify.sh                                  # 컨테이너 기동 + 전 단계 REST 검증 (23 assert)
 npm i playwright
-CHROME=$(which chromium) node console-checks.mjs   # 콘솔 화면 검증 (33 assert)
-docker rm -f kc-verify                       # 정리
+
+# (1) 원본 가이드의 주장 검증 — REST (23 assert)
+./verify.sh
+
+# (2) 수정본 가이드를 콘솔에서 그대로 수행 (30 assert)
+./setup-baseline.sh                                   # 빈 Keycloak + realm/client/users 만 준비
+CHROME=$(which chromium) node console-run.mjs
+
+# (3) 콘솔 화면/라벨 단독 검증 (33 assert) — (2) 실행 후 상태에서
+CHROME=$(which chromium) node console-checks.mjs
+
+docker rm -f kc-verify                                # 정리
 ```
 
-`verify.sh` 는 빈 Keycloak 에 realm `itgrims`, 클라이언트 `itgrims-client`, 사용자 3명 + 서비스 계정을
-만든 뒤 가이드의 각 단계를 콘솔과 동일한 REST 호출로 수행하고, 가이드의 주장과 그 반례
-(Group Membership 매퍼, Multivalued On, 다른 클라이언트, Required 조합)를 함께 검증한다.
+| 파일 | 역할 |
+|---|---|
+| `kcconsoleguide-revised.md` | **수정본 가이드** (배포용) |
+| `setup-baseline.sh` | 빈 Keycloak 에 작업 전 상태(realm/client/users)만 구성 |
+| `console-run.mjs` | 수정본 가이드를 콘솔 UI 로 전 단계 수행 + 검증 |
+| `verify.sh` | 원본 가이드의 주장과 반례를 REST 로 검증 |
+| `console-checks.mjs` | 콘솔 화면 구성/라벨 검증 |
