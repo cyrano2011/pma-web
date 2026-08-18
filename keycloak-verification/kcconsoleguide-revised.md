@@ -332,6 +332,35 @@ On 이면 `UPDATE_PASSWORD` 필수 액션이 붙어 최초 로그인에서 비�
 
 검증 스크립트: `verify.sh` (REST), `console-run.mjs` (콘솔 UI 로 전 단계 수행), `console-checks.mjs` (화면 검증).
 
+## 부록 C — 스텝별 수행 스크립트
+
+계정 수가 많아 콘솔 클릭이 비현실적이거나, 작업 전후 상태를 기계적으로 확인하고 싶을 때 쓰는
+스크립트를 `steps/` 에 두었다. 콘솔이 호출하는 것과 **같은 Admin REST 엔드포인트**만 쓰고,
+사용자 레코드는 GET 한 표현에 `attributes` 만 병합해 PUT 한다 — 「왜 콘솔인가」에서 경고한
+`{"attributes": ...}` 단독 PUT 경로는 타지 않는다.
+
+| 스크립트 | 대응 단계 |
+|---|---|
+| `steps/00-check-realm.sh` | 0단계 realm 확인 + 현재 진행 상태 (읽기 전용) |
+| `steps/01-groups.sh` | 1단계 사업 그룹 |
+| `steps/02-user-profile.sh` | 2단계 속성 선언 (Required Off 강제) |
+| `steps/03-mapper.sh` | 3단계 매퍼 (Group Membership·Multivalued 경고 포함) |
+| `steps/04-assign.sh` | 4단계 값·그룹, 서비스 계정, 나머지 채우기 |
+| `steps/05-verify-token.sh` | 5단계 토큰 검증 |
+| `steps/06-audit.sh` | 6단계 전수 확인 (누락 시 종료코드 1) |
+| `steps/99-rollback.sh` | 되돌리기 |
+| `steps/run-all.sh` | 0~6 순차 실행 |
+
+```bash
+cd steps
+./run-all.sh --csv accounts.csv            # 계획만 출력 (dry-run 이 기본)
+./run-all.sh --csv accounts.csv --apply    # 실제 반영
+```
+
+쓰기 스크립트는 **기본이 dry-run** 이고 `--apply` 를 붙일 때만 반영한다. 모두 멱등하며,
+`--fill-remaining` 은 값이 이미 있는 계정을 건드리지 않는다(천안 계정이 본사로 덮이는 사고 방지).
+자세한 사용법은 `steps/README.md`.
+
 ## 부록 B — 이 수정본의 검증 기록
 
 빈 Keycloak 26.4.7 컨테이너를 새로 띄우고(`setup-baseline.sh`) **이 문서의 0~6단계를 콘솔에서 그대로 클릭해

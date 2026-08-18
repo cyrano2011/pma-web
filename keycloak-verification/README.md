@@ -166,3 +166,22 @@ docker rm -f kc-verify                                # 정리
 | `console-run.mjs` | 수정본 가이드를 콘솔 UI 로 전 단계 수행 + 검증 |
 | `verify.sh` | 원본 가이드의 주장과 반례를 REST 로 검증 |
 | `console-checks.mjs` | 콘솔 화면 구성/라벨 검증 |
+| `steps/` | **스텝별 수행 스크립트** (00~06 + 롤백 + run-all). 자세한 내용은 `steps/README.md` |
+
+## 7. 스텝별 수행 스크립트
+
+계정이 많아 콘솔 클릭이 비현실적이거나 상태를 기계적으로 확인해야 할 때를 위해 단계별 스크립트를
+`steps/` 에 두었다. 콘솔과 동일한 REST 엔드포인트만 쓰고, 사용자 레코드는 GET 한 표현에
+`attributes` 만 병합해 PUT 하므로 가이드가 경고한 필드 삭제 경로를 타지 않는다.
+
+```bash
+cd steps
+./run-all.sh --csv accounts.csv            # 전체 dry-run (기본)
+./run-all.sh --csv accounts.csv --apply    # 0~6 단계 실행
+./99-rollback.sh --apply                   # 되돌리기
+```
+
+빈 Keycloak 26.4.7 에서 확인한 것: `run-all.sh --apply` 전 과정 통과(6단계 판정식 성립),
+dry-run 실행 후 realm 무변경, 재실행 멱등, `--fill-remaining` 이 `CHEONAN` 을 덮지 않음,
+04 실행 후 `email`/`firstName`/`lastName` 보존, 값 없는 계정 발생 시 06 이 종료코드 1,
+롤백 후 원상복구.
