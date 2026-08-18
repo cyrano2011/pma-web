@@ -71,6 +71,27 @@ hq1,ITGRIMS
 | `99-rollback.sh` | 되돌리기 | `--apply` |
 | `run-all.sh` | 0~6 순차 실행 | `--apply` 전달 |
 
+## 기존 계정 정보가 지워지지 않는지 (데이터 안전성)
+
+`../data-safety-test.sh` 가 빈 Keycloak 에 **기존 운영 데이터를 갖춘 계정**(이메일·이름·emailVerified·
+비밀번호·필수 액션·realm 역할·기존 그룹 소속·User Profile 에 선언되지 않은 legacy 속성)을 만들고,
+`01~04` 를 돌린 뒤 전후를 필드 단위로 비교한다. **PASS 50 / FAIL 0.**
+
+| 검사 | 결과 |
+|---|---|
+| email / firstName / lastName / emailVerified / enabled / createdTimestamp | 전부 그대로 |
+| requiredActions (`CONFIGURE_TOTP`) | 그대로 |
+| credential(비밀번호) — id 까지 동일 | 그대로, 같은 비밀번호로 로그인 성공 |
+| realm 역할 (`wms-operator`) | 그대로 |
+| 기존 그룹 (`/legacy-team`) | 그대로 + `/business/...` 만 추가 |
+| 미선언 legacy 속성 (`dept`, `employeeNo`) | **삭제되지 않음.** Unmanaged 정책이 Disabled 라 화면에서 숨겨질 뿐이고, 정책을 Enabled 로 되돌리면 값이 그대로 나온다 |
+| Unmanaged 정책이 Enabled 인 realm 에서 04 재실행 | 다른 속성(`nickname`, `dept`) 유지, `business` 만 변경 |
+| 대조군: `{"attributes":...}` 단독 PUT | email/이름이 `null` 이 되고 로그인 불가 — steps/ 는 이 경로를 쓰지 않음 |
+
+```bash
+./data-safety-test.sh          # 컨테이너 새로 띄우고 전체 검사
+```
+
 ## 검증 기록
 
 빈 Keycloak 26.4.7 (`../setup-baseline.sh`) 에서 확인:

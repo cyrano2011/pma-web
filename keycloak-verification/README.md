@@ -181,6 +181,17 @@ cd steps
 ./99-rollback.sh --apply                   # 되돌리기
 ```
 
+### 기존 계정 정보 삭제 여부
+
+`data-safety-test.sh` — 기존 운영 데이터를 갖춘 계정(이메일·이름·비밀번호·필수 액션·realm 역할·
+기존 그룹·미선언 legacy 속성)을 만들고 스크립트 전후를 필드 단위로 비교한다. **PASS 50 / FAIL 0**.
+이메일·이름·emailVerified·createdTimestamp·필수 액션·비밀번호(credential id 동일)·역할·기존 그룹이
+모두 보존되고, `/business/...` 그룹만 추가된다. 같은 비밀번호로 로그인도 그대로 된다.
+User Profile 에 선언되지 않은 legacy 속성(`dept`, `employeeNo`)도 **지워지지 않는다** — Unmanaged
+정책이 Disabled 라 화면에서 숨겨질 뿐, 정책을 Enabled 로 되돌리면 값이 그대로 나온다.
+대조군으로 돌린 `{"attributes":...}` 단독 PUT 은 같은 조건에서 email/이름을 `null` 로 만들고
+계정 로그인을 깨뜨린다.
+
 빈 Keycloak 26.4.7 에서 확인한 것: `run-all.sh --apply` 전 과정 통과(6단계 판정식 성립),
 dry-run 실행 후 realm 무변경, 재실행 멱등, `--fill-remaining` 이 `CHEONAN` 을 덮지 않음,
 04 실행 후 `email`/`firstName`/`lastName` 보존, 값 없는 계정 발생 시 06 이 종료코드 1,
