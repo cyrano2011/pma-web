@@ -1,0 +1,10 @@
+flowchart LR
+    L0["L0 실험<br/>합성 데이터<br/>승인 없음"]
+    L0 -->|"자동 심사<br/>시크릿·PII·도구 검사"| L1["L1 부서<br/>읽기 전용 실데이터<br/>90일 만료"]
+    L1 -->|"승격 게이트<br/>보안+데이터오너+IT"| L2["L2 운영<br/>쓰기 승인<br/>등록부 등재"]
+    L1 -.->|"미갱신 시<br/>자동 회수"| X["폐기"]
+    L2 -.->|"오너 부재<br/>90일 무사용"| X
+
+    style L0 fill:#e6f4ea,stroke:#34a853,color:#202124
+    style L1 fill:#fef7e0,stroke:#fbbc04,color:#202124
+    style L2 fill:#fce8e6,stroke:#d93025,color:#202124

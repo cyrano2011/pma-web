@@ -9,6 +9,7 @@
 | 대상 | 사내 IT/보안 담당, AI 도입 TF |
 | 범위 | 아키텍처 · 솔루션 선정 · 도입 로드맵 · 운영 프로세스 |
 | 전제 | 사내 IdP 로 **Keycloak** 운영 중 (`auth.returnit.co.kr`, realm `itgrims`) — 이 자산을 재활용하는 설계다 |
+| 발표자료 | [`proposal-deck.pdf`](proposal-deck.pdf) — 이 문서를 15장으로 요약한 16:9 슬라이드 (소스: [`deck/`](deck/)) |
 | 부록 | [`reference/`](reference/) — 그대로 적용 가능한 설정 파일 5종 |
 
 ---
@@ -592,6 +593,7 @@ gantt
 | [`reference/keycloak-agent-identity.md`](reference/keycloak-agent-identity.md) | 기존 Keycloak 으로 에이전트 신원·권한 상속 구성 |
 | [`reference/agent-registry.schema.json`](reference/agent-registry.schema.json) | 에이전트 등록부 스키마 + 위험 자동 판정 규칙 |
 | [`reference/promotion-gate.yml`](reference/promotion-gate.yml) | 승격 게이트 CI 워크플로 |
+| [`proposal-deck.pdf`](proposal-deck.pdf) | 이 문서를 15장으로 요약한 발표자료 (빌드: [`deck/`](deck/)) |
 
 ---
 

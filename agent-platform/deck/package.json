@@ -1,0 +1,11 @@
+{
+  "name": "agent-platform-deck",
+  "private": true,
+  "description": "제안서 발표자료(proposal-deck.pdf) 빌드 도구",
+  "type": "module",
+  "scripts": { "build": "python3 build.py" },
+  "dependencies": {
+    "@mermaid-js/mermaid-cli": "^11.4.2",
+    "puppeteer": "^23.0.0"
+  }
+}

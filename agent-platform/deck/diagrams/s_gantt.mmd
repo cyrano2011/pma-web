@@ -1,0 +1,32 @@
+gantt
+    todayMarker off
+    dateFormat YYYY-MM-DD
+    axisFormat %m/%d
+
+    section 0. 준비
+    현황조사·정책 초안·전담조직 구성   :a1, 2026-09-15, 2w
+
+    section 1. 게이트웨이 (효과 즉시)
+    LiteLLM 구축·Keycloak 연동          :b1, after a1, 2w
+    모델 allowlist·예산캡·감사로그       :b2, after b1, 1w
+    PII 마스킹 필터                      :b3, after b1, 2w
+
+    section 2. 작성 환경
+    devcontainer + egress allowlist 표준 :c1, after b1, 2w
+    원격 워크스페이스(Coder) 파일럿      :c2, after c1, 3w
+    3사 도구 관리형 정책 배포            :c3, after c1, 2w
+    Dify 자체호스팅 (노코드 트랙)        :c4, after b2, 3w
+
+    section 3. 도구 관문
+    MCP 레지스트리·게이트웨이            :d1, after b2, 3w
+    Keycloak Token Exchange 연동         :d2, after d1, 2w
+    gVisor RuntimeClass (런타임 샌드박스) :d3, after d1, 2w
+
+    section 4. 공급망·거버넌스
+    템플릿 레포·승격 게이트 CI           :e1, after c1, 3w
+    등록부 스키마·검증 자동화            :e2, after e1, 2w
+    패키지 프록시 allowlist              :e3, after e1, 2w
+
+    section 5. 확산
+    파일럿 2개 부서 · 교육               :f1, after d2, 3w
+    전사 오픈                            :f2, after f1, 2w

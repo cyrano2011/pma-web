@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant U as 임직원
+    participant A as 에이전트
+    participant GW as MCP 게이트웨이
+    participant KC as Keycloak
+    participant API as WMS API
+
+    U->>A: "어제 천안 반품 건수?"
+    A->>GW: 도구 호출 + 사용자 토큰
+    GW->>KC: Token Exchange<br/>scope=read:inventory
+    KC-->>GW: 단명 토큰<br/>business=CHEONAN
+    GW->>API: 조회 (읽기 전용)
+    API-->>GW: 천안 데이터만
+    GW-->>A: 결과 · PII 마스킹 · 감사로그
+    A-->>U: 답변

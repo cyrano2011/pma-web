@@ -1,0 +1,84 @@
+@page { size: 1280px 720px; margin: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { background:#fff; }
+body {
+  font-family:'Noto Sans CJK KR','Noto Sans KR',sans-serif;
+  color:#0f172a; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+.slide {
+  width:1280px; height:720px; position:relative; overflow:hidden;
+  page-break-after:always; break-after:page; background:#fff;
+  padding:52px 64px 56px;
+}
+.slide:last-child { page-break-after:auto; break-after:auto; }
+
+/* ── 표지 ── */
+.cover { background:#0f172a; color:#fff; padding:0; }
+.cover .bar { position:absolute; left:0; top:0; width:10px; height:100%; background:#2563eb; }
+.cover .inner { position:absolute; left:96px; top:186px; right:96px; }
+.cover .kicker { font-size:17px; letter-spacing:.22em; color:#7dd3fc; font-weight:600; margin-bottom:28px; }
+.cover h1 { font-size:52px; font-weight:700; line-height:1.32; letter-spacing:-.01em; }
+.cover h2 { font-size:26px; font-weight:400; color:#cbd5e1; margin-top:22px; letter-spacing:.02em; }
+.cover .meta { position:absolute; left:96px; bottom:70px; font-size:15px; color:#94a3b8; line-height:1.9; }
+.cover .meta b { color:#e2e8f0; font-weight:600; }
+
+/* ── 공통 헤더 ── */
+.hdr { display:flex; align-items:baseline; gap:14px; border-bottom:2px solid #0f172a; padding-bottom:13px; margin-bottom:26px; }
+.hdr .no { font-size:14px; font-weight:700; color:#2563eb; letter-spacing:.06em; }
+.hdr h3 { font-size:30px; font-weight:700; letter-spacing:-.01em; }
+.hdr .sub { font-size:15px; color:#64748b; margin-left:auto; font-weight:500; }
+
+.lead { font-size:19px; line-height:1.62; color:#1e293b; margin-bottom:22px; }
+.lead b, .hl { color:#1d4ed8; font-weight:700; }
+.neg { color:#b91c1c; font-weight:700; }
+
+/* ── 표 ── */
+table { width:100%; border-collapse:collapse; font-size:15.5px; }
+th, td { padding:10px 13px; text-align:left; vertical-align:top; line-height:1.5; }
+thead th { background:#0f172a; color:#fff; font-weight:600; font-size:14.5px; letter-spacing:.01em; }
+tbody tr { border-bottom:1px solid #e2e8f0; }
+tbody tr:nth-child(even) { background:#f8fafc; }
+td.k { font-weight:700; color:#0f172a; white-space:nowrap; }
+td.c { text-align:center; }
+table.sm { font-size:14.5px; }
+table.sm th, table.sm td { padding:8px 11px; }
+.tag { display:inline-block; padding:1px 8px; border-radius:3px; font-size:13px; font-weight:700; }
+.tag.b { background:#dbeafe; color:#1d4ed8; }
+.tag.g { background:#dcfce7; color:#15803d; }
+.tag.y { background:#fef3c7; color:#a16207; }
+.tag.r { background:#fee2e2; color:#b91c1c; }
+
+/* ── 레이아웃 ── */
+.fig { width:100%; display:flex; justify-content:center; align-items:center; }
+.fig svg { display:block; height:auto; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+.two.w { grid-template-columns:1.15fr .85fr; }
+.two.n { grid-template-columns:.62fr 1.38fr; }
+
+.cards { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.card { border:1px solid #cbd5e1; border-top:4px solid #2563eb; border-radius:5px; padding:16px 17px; background:#fff; }
+.card h4 { font-size:17px; font-weight:700; margin-bottom:9px; color:#0f172a; }
+.card p { font-size:14.5px; line-height:1.62; color:#334155; }
+
+.note { margin-top:20px; background:#f1f5f9; border-left:4px solid #2563eb; padding:14px 18px; font-size:16px; line-height:1.6; color:#1e293b; }
+.note.warn { background:#fef2f2; border-left-color:#dc2626; }
+.note b { font-weight:700; }
+
+ul.bul { list-style:none; }
+ul.bul li { font-size:16.5px; line-height:1.55; padding-left:20px; position:relative; margin-bottom:11px; color:#1e293b; }
+ul.bul li::before { content:'—'; position:absolute; left:0; color:#2563eb; font-weight:700; }
+ul.bul li b { font-weight:700; color:#0f172a; }
+
+.big { font-size:25px; font-weight:700; line-height:1.5; letter-spacing:-.01em; }
+.big .em { color:#1d4ed8; }
+.big .neg { color:#b91c1c; }
+
+.foot { position:absolute; left:64px; right:64px; bottom:22px; display:flex; font-size:12.5px; color:#94a3b8; border-top:1px solid #e2e8f0; padding-top:9px; }
+.foot .pg { margin-left:auto; font-weight:600; color:#64748b; }
+
+/* ── 강제 지점 스트립 (요약 슬라이드) ── */
+.strip { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:24px; }
+.strip .s { border:1px solid #cbd5e1; border-radius:5px; padding:14px 15px; background:#f8fafc; }
+.strip .s .n { font-size:15px; font-weight:700; color:#1d4ed8; }
+.strip .s .t { font-size:16px; font-weight:700; margin:3px 0 7px; }
+.strip .s .d { font-size:14px; line-height:1.55; color:#475569; }
