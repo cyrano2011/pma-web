@@ -282,4 +282,48 @@
   <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">15</span></div>
 </section>
 
+<!-- 16 예상 작업과 준비 사항 -->
+<section class="slide" id="scope">
+  <style>#scope table.sm th,#scope table.sm td{padding:6.5px 11px}#scope .req li{margin-bottom:3px}</style>
+  <div class="hdr"><span class="no">15</span><h3>예상 작업과 준비 사항</h3><span class="sub">안 B 기준 · 병렬 진행 시 10~14주</span></div>
+  <div class="two" style="grid-template-columns:1.32fr .68fr;gap:28px;align-items:flex-start">
+    <div>
+      <table class="sm">
+        <thead><tr><th style="width:23%">작업</th><th>주요 산출물</th><th style="width:9%">기간</th></tr></thead>
+        <tbody>
+          <tr><td class="k">① AI 게이트웨이</td><td>LiteLLM · IdP 연동 · 모델 allowlist · 예산 캡 · 감사로그 · PII 마스킹</td><td class="k">3주</td></tr>
+          <tr><td class="k">② 작성 환경</td><td>devcontainer + 이그레스 allowlist · 원격 워크스페이스 · 3사 관리형 정책</td><td class="k">4주</td></tr>
+          <tr><td class="k">③ 노코드 트랙</td><td>Dify 자체호스팅 · SSO/RBAC · 게이트웨이 연동</td><td class="k">3주</td></tr>
+          <tr><td class="k">④ 도구·데이터 관문</td><td>MCP 레지스트리·게이트웨이 · Token Exchange · gVisor 런타임</td><td class="k">5주</td></tr>
+          <tr><td class="k">⑤ 공급망·승격 게이트</td><td>템플릿 레포 · 심사 CI · 등록부 스키마와 검증 · 패키지 프록시</td><td class="k">4주</td></tr>
+          <tr><td class="k">⑥ 관측·감사</td><td>Langfuse / OTel · SIEM 연동 · 비용 대시보드</td><td class="k">2주</td></tr>
+          <tr><td class="k">⑦ 온보딩</td><td>골든패스 템플릿 10종 · 사내 카탈로그 · 워크숍 교재 · 앰배서더 운영</td><td class="k">4주</td></tr>
+          <tr><td class="k">⑧ 거버넌스</td><td>AI 사용 정책 개정 · 위험 등급 판정 기준 · 분기 감사 절차</td><td class="k">병행</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:13.5px;color:var(--mute);margin-top:7px">기간은 작업별 소요이고 상당 부분이 병렬로 진행된다. 총 10~14주 · 전담 1.5~2명 + 보안 검토 0.5명 전제의 개략 추정이다.</p>
+    </div>
+    <div class="req">
+      <div class="g"><h5>조직 — 가장 중요</h5>
+        <ul><li><b>플랫폼 전담 1.5~2명</b> (구축 후에도 유지)</li>
+            <li>보안 검토 0.5명</li>
+            <li>부서별 <b>앰배서더 5~10명</b> · 업무시간 20%</li>
+            <li>데이터 오너 지정</li></ul></div>
+      <div class="g"><h5>인프라 · 권한</h5>
+        <ul><li>K8s 클러스터 (gVisor RuntimeClass 추가)</li>
+            <li>사내 IdP 관리자 권한</li>
+            <li>이그레스 정책 변경 권한</li>
+            <li>Vault 또는 Secrets Manager</li></ul></div>
+      <div class="g"><h5>계약 · 데이터 · 정책</h5>
+        <ul><li>모델 3사 기업 계약 — <b>학습 미사용·보존기간 명시</b></li>
+            <li>데이터 등급 기준과 PII 정의</li>
+            <li>PoC용 합성 데이터셋</li>
+            <li>AI 사용 정책 개정 승인 · 고영향 AI 법무 검토</li>
+            <li>1차 연동 사내 API 목록과 담당자</li></ul></div>
+    </div>
+  </div>
+  <div class="note warn" style="margin-top:14px;padding:11px 18px;font-size:15px"><b>착수 전에 확인할 3가지 —</b> ① 사내 IdP의 <b>Token Exchange 지원 형태</b> &nbsp;② 기존 K8s의 <b>gVisor 사용 가능 여부</b> &nbsp;③ <b>한국어 PII 인식률</b>(주민등록번호·주소는 커스텀 인식기 필요). 셋 다 설계를 바꿀 수 있어 킥오프 첫 주에 검증한다.</div>
+  <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">16</span></div>
+</section>
+
 </body></html>

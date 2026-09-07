@@ -98,3 +98,13 @@ ul.bul li b { font-weight:700; color:var(--ink); }
 .strip .s .n { font-size:15px; font-weight:700; color:var(--brand); }
 .strip .s .t { font-size:16px; font-weight:700; margin:3px 0 7px; }
 .strip .s .d { font-size:14px; line-height:1.55; color:#475569; }
+
+/* ── 준비 사항 목록 (마무리 슬라이드) ── */
+.req { font-size:14.5px; }
+.req h5 { font-size:14px; font-weight:700; color:var(--brand); letter-spacing:.02em;
+          border-bottom:1px solid var(--brand-edge); padding-bottom:4px; margin:0 0 7px; }
+.req h5:not(:first-child), .req .g + .g h5 { margin-top:14px; }
+.req ul { list-style:none; margin-bottom:2px; }
+.req li { position:relative; padding-left:12px; line-height:1.5; margin-bottom:4px; color:#334155; }
+.req li::before { content:'·'; position:absolute; left:2px; color:var(--brand); font-weight:700; }
+.req li b { color:var(--ink); font-weight:700; }
