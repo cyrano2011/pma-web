@@ -34,7 +34,7 @@ model_list:
       lane: ["L0", "L1", "L2"]
       data_classes: ["public", "internal", "pii"]
 
-  # 사내 오픈모델 — PII 가 외부로 전혀 나가면 안 되는 워크로드용
+  # 사내 오픈모델 — PII가 외부로 전혀 나가면 안 되는 워크로드용
   - model_name: internal-llm
     litellm_params:
       model: openai/qwen3-32b
