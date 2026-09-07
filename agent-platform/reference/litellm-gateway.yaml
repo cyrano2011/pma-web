@@ -1,0 +1,126 @@
+# AI 게이트웨이 정책 예시 — LiteLLM Proxy (자체호스팅)
+#
+# 목적: 임직원·에이전트 누구도 벤더 API 키를 갖지 않는다.
+#       모두 이 게이트웨이의 가상 키(virtual key)만 받고,
+#       실제 벤더 키는 이 프로세스의 환경변수에만 존재한다.
+#
+# 배포:  helm / docker-compose. 벤더 키는 Vault → 환경변수로 주입.
+# 검증:  이 파일은 골격이다. 실제 적용 전 LiteLLM 버전의 스키마를 확인할 것.
+
+model_list:
+  # ── 승인된 모델만 등록한다. 여기 없는 모델은 호출 자체가 불가능하다. ──
+  - model_name: claude-opus-5
+    litellm_params:
+      model: anthropic/claude-opus-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+    model_info:
+      lane: ["L0", "L1", "L2"]
+      data_classes: ["public", "internal", "pii"]   # 기업 계약(학습 미사용) 확인 완료
+
+  - model_name: gpt-5
+    litellm_params:
+      model: openai/gpt-5
+      api_key: os.environ/OPENAI_API_KEY
+    model_info:
+      lane: ["L0", "L1", "L2"]
+      data_classes: ["public", "internal", "pii"]
+
+  - model_name: gemini-3-pro
+    litellm_params:
+      model: vertex_ai/gemini-3-pro
+      vertex_project: os.environ/VERTEX_PROJECT
+      vertex_location: asia-northeast3          # 데이터 리전 고정
+    model_info:
+      lane: ["L0", "L1", "L2"]
+      data_classes: ["public", "internal", "pii"]
+
+  # 사내 오픈모델 — PII 가 외부로 전혀 나가면 안 되는 워크로드용
+  - model_name: internal-llm
+    litellm_params:
+      model: openai/qwen3-32b
+      api_base: http://vllm.ai.svc.cluster.local:8000/v1
+      api_key: none
+    model_info:
+      lane: ["L0", "L1", "L2"]
+      data_classes: ["public", "internal", "pii", "sensitive"]
+
+router_settings:
+  routing_strategy: usage-based-routing-v2
+  num_retries: 2
+  allowed_fails: 3
+  cooldown_time: 30
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+
+  # ── Keycloak SSO 연동: 가상 키가 사람/팀에 묶인다 (익명 사용 불가) ──
+  litellm_jwtauth:
+    admin_jwt_scope: "litellm-admin"
+    team_id_jwt_field: "groups"
+    user_id_jwt_field: "preferred_username"
+    public_key_ttl: 600
+  enforce_user_param: true
+
+  # ── 전량 감사 로그. 마스킹 후 저장, SIEM 전송 ──
+  store_model_in_db: true
+  store_prompts_in_spend_logs: true
+  alerting: ["slack"]
+  alerting_threshold: 300
+
+litellm_settings:
+  callbacks: ["langfuse", "otel"]
+  redact_user_api_key_info: false      # 누가 호출했는지는 반드시 남긴다
+  success_callback: ["langfuse"]
+  failure_callback: ["langfuse", "slack"]
+  drop_params: true
+  set_verbose: false
+
+  # ── 가드레일: PII 마스킹 · 인젝션 탐지 · 유해 출력 ──
+  guardrails:
+    - guardrail_name: "pii-mask-in"
+      litellm_params:
+        guardrail: presidio
+        mode: "pre_call"
+        presidio_analyzer_api_base: http://presidio-analyzer.ai.svc.cluster.local:5002
+        presidio_anonymizer_api_base: http://presidio-anonymizer.ai.svc.cluster.local:5001
+        pii_entities_config:
+          KR_RRN: "MASK"          # 주민등록번호
+          PHONE_NUMBER: "MASK"
+          EMAIL_ADDRESS: "MASK"
+          PERSON: "MASK"
+          LOCATION: "MASK"        # 배송 주소
+          CREDIT_CARD: "BLOCK"
+
+    - guardrail_name: "prompt-injection"
+      litellm_params:
+        guardrail: lakera            # 또는 자체 규칙 필터
+        mode: "pre_call"
+
+    - guardrail_name: "output-safety"
+      litellm_params:
+        guardrail: bedrock           # 또는 llama-guard 자체호스팅
+        mode: "post_call"
+
+# ─────────────────────────────────────────────────────────────
+# 레인별 정책은 team / key 생성 시 적용한다 (Admin API 또는 UI)
+#
+#   L0 실험 레인 — 전 임직원 기본
+#     max_budget: 30            # USD/월, 초과 시 자동 차단
+#     models: [claude-sonnet-5, gpt-5, gemini-3-pro, internal-llm]
+#     guardrails: [pii-mask-in, prompt-injection, output-safety]
+#     metadata: {lane: L0, allow_internal_api: false}
+#
+#   L1 부서 레인 — 교육 이수자
+#     max_budget: 150
+#     models: [전체]
+#     metadata: {lane: L1, allow_internal_api: "read-only"}
+#
+#   L2 운영 레인 — 승격 심사 통과 에이전트 (사람이 아니라 에이전트에 발급)
+#     max_budget: 에이전트별 산정
+#     rpm_limit / tpm_limit 설정
+#     metadata: {lane: L2, agent_id: <등록부 ID>, owner: <오너>}
+#
+# 예산 초과 시 차단되는 것이 정상 동작이다. 오너에게 알림이 가고,
+# 상향은 등록부 갱신 + 승인을 거친다. (R6 비용 폭주 방지)
+# ─────────────────────────────────────────────────────────────

@@ -1,0 +1,139 @@
+# 승격 게이트 — .github/workflows/promotion-gate.yml
+#
+# 에이전트 템플릿 레포에 기본 포함되며, 브랜치 보호에서 필수 체크로 지정한다.
+# 비개발자에게 코드 리뷰를 요구하는 대신 이 자동 심사가 대부분을 판정한다.
+# 사람 승인은 L2 에서만 개입한다.
+
+name: promotion-gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+
+jobs:
+  registry:
+    name: 1. 등록부 검증 및 위험 판정
+    runs-on: ubuntu-latest
+    outputs:
+      lane: ${{ steps.judge.outputs.lane }}
+      blocked: ${{ steps.judge.outputs.blocked }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: agent.yaml 존재 확인
+        run: test -f agent.yaml || { echo "::error::agent.yaml 이 없다. 등록부 없는 에이전트는 배포할 수 없다."; exit 1; }
+
+      - name: 스키마 검증
+        run: |
+          pip install check-jsonschema
+          check-jsonschema --schemafile .platform/agent-registry.schema.json agent.yaml
+
+      - name: 위험 자동 판정
+        id: judge
+        run: python .platform/judge_risk.py agent.yaml >> "$GITHUB_OUTPUT"
+        # judge_risk.py 가 판정하는 것:
+        #  - 치명 조합(PII + 신뢰불가 입력 + write/external_send) → blocked=true
+        #  - 선언된 models 가 게이트웨이 allowlist 에 있는가
+        #  - 선언된 mcp_server 가 내부 MCP 레지스트리에 등재되어 있는가
+        #  - review_due 가 미래이고 1년 이내인가
+        #  - owner / backup_owner 가 재직 중인가 (Keycloak 조회)
+        #  - lane 별 제약 (L0 에 실데이터 없음 등)
+
+      - name: 치명 조합 차단
+        if: steps.judge.outputs.blocked == 'true'
+        run: |
+          echo "::error::PII + 신뢰불가 입력 + 외부 발신/쓰기 가 동시에 선언되었다."
+          echo "셋 중 하나를 제거하거나 human_in_loop 를 켜야 한다. 제안서 1장 참조."
+          exit 1
+
+  secrets:
+    name: 2. 시크릿 검사
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 하드코딩된 엔드포인트/키 패턴
+        run: |
+          # 게이트웨이를 우회하는 벤더 직결 호출 차단
+          if grep -rEn 'api\.(openai|anthropic)\.com|generativelanguage\.googleapis\.com' \
+               --include='*.py' --include='*.ts' --include='*.js' --include='*.yaml' . ; then
+            echo "::error::벤더 API 직결이 발견되었다. 반드시 사내 AI 게이트웨이를 경유해야 한다."
+            exit 1
+          fi
+
+  sast:
+    name: 3. 코드 취약점 (SAST)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/default
+            p/secrets
+            p/owasp-top-ten
+            .platform/semgrep-agent-rules.yaml
+        # 자체 규칙에서 잡을 것:
+        #  - eval / exec / shell=True 사용
+        #  - 모델 출력을 검증 없이 SQL·명령·경로에 사용
+        #  - 사용자 토큰 없이 서비스 계정으로 사내 API 호출
+
+  deps:
+    name: 4. 의존성 · 공급망
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 패키지 출처 확인
+        run: |
+          # 사내 프록시가 아닌 곳에서 받는 설정이면 차단 (환각 패키지 방어)
+          for f in .npmrc pip.conf requirements.txt pyproject.toml package-lock.json; do
+            [ -f "$f" ] || continue
+            if grep -qE 'registry\.npmjs\.org|pypi\.org/simple' "$f"; then
+              echo "::error::$f 가 공용 레지스트리를 직접 참조한다. 사내 프록시만 허용된다."
+              exit 1
+            fi
+          done
+      - uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+          ignore-unfixed: true
+      - name: SBOM 생성
+        run: |
+          pip install cyclonedx-bom || true
+          echo "SBOM 을 아티팩트로 첨부하고 등록부에 연결한다"
+
+  deploy:
+    name: 5. 배포
+    needs: [registry, secrets, sast, deps]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # L1 은 팀장 1인, L2 는 보안+데이터오너+IT 3자 승인을 GitHub Environment 로 강제한다
+    environment: ${{ needs.registry.outputs.lane }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keycloak client 동기화
+        run: python .platform/sync_keycloak_client.py agent.yaml
+        # 등록부의 tools[].scope 로 client scope 를 재생성한다.
+        # 코드가 선언보다 넓은 권한을 쓰려 해도 토큰에 스코프가 없어 실패한다.
+      - name: 게이트웨이 가상키 발급/갱신
+        run: python .platform/sync_gateway_key.py agent.yaml
+        # 모델 allowlist, 월 예산, rpm/tpm 을 등록부 값으로 설정한다.
+      - name: Argo CD 동기화
+        run: |
+          NS="agents-${{ needs.registry.outputs.lane }}"
+          echo "네임스페이스 $NS 에 배포. L1 은 TTL 90일 라벨을 붙인다."
+      - name: 등록부 등재
+        run: python .platform/publish_registry.py agent.yaml
+        # 사내 에이전트 카탈로그에 게시. 오너·비용·만료일이 대시보드에 노출된다.
