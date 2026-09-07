@@ -13,7 +13,7 @@
   <div class="meta">
     2026-09-07<br>
     대상 &nbsp;<b>사내 IT · 보안 담당, AI 도입 TF</b><br>
-    전제 &nbsp;<b>사내 IdP 로 Keycloak 운영 중 (realm itgrims)</b>
+    전제 &nbsp;<b>사내 IdP(SSO) 운영 중 · 사내 K8s 보유</b>
   </div>
 </section>
 
@@ -27,13 +27,13 @@
   <div class="cards">
     <div class="card"><h4>무엇을 통제하나</h4><p>모델 접근 · 데이터 · 자격증명 · 실행권한 · 배포 · 비용.<br>도구를 통제하는 게 아니라 <b>이 6가지가 지나가는 길목</b>을 통제한다.</p></div>
     <div class="card"><h4>핵심 원칙</h4><p>비개발자에게 <b>만들 자유는 최대로</b>, <b>권한은 한 톨도</b> 주지 않는다. 권한은 실행 시점에 에이전트가 사용자로부터 빌린다.</p></div>
-    <div class="card"><h4>기존 자산 재활용</h4><p>운영 중인 <b>Keycloak</b> 을 그대로 쓴다. 새 IAM 도입 불필요. <code>business</code> 클레임이 에이전트에도 자동 적용된다.</p></div>
+    <div class="card"><h4>기존 자산 재활용</h4><p>운영 중인 <b>사내 IdP</b> 를 그대로 쓴다. 새 IAM 도입 불필요. 기존 <b>조직 구분 클레임</b>이 에이전트에도 자동 적용된다.</p></div>
   </div>
   <div class="note"><b>권고 —</b> 안 B(자체호스팅 하이브리드). 단 <b>AI 게이트웨이부터 2주</b> 안에 착수하고, 8주간은 합성 데이터로만 PoC. <b>전담 인력 1.5~2명 확보가 전제조건</b>이다.</div>
   <div class="strip">
     <div class="s"><div class="n">①</div><div class="t">작성 환경</div><div class="d">원격 워크스페이스<br>+ 샌드박스 + 이그레스 allowlist<br><b>개인 PC 금지</b></div></div>
     <div class="s"><div class="n">②</div><div class="t">AI 게이트웨이</div><div class="d">LiteLLM 자체호스팅<br>모델 allowlist · 예산 캡<br><b>아무도 벤더 키를 못 가짐</b></div></div>
-    <div class="s"><div class="n">③</div><div class="t">도구 · 데이터 관문</div><div class="d">MCP 게이트웨이 + Keycloak<br><b>에이전트는 사용자 권한만 상속</b></div></div>
+    <div class="s"><div class="n">③</div><div class="t">도구 · 데이터 관문</div><div class="d">MCP 게이트웨이 + 사내 IdP<br><b>에이전트는 사용자 권한만 상속</b></div></div>
     <div class="s"><div class="n">④</div><div class="t">승격 게이트</div><div class="d">템플릿 레포 · 자동심사 CI<br><b>운영 반영은 통과분만</b></div></div>
   </div>
   <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">2</span></div>
@@ -69,7 +69,7 @@
     <tbody>
       <tr><td class="k">R1</td><td class="k">데이터 유출</td><td>CS 에이전트를 만들다 고객 주소·연락처 CSV 를 그대로 외부 모델에 붙여넣음</td><td class="c"><span class="tag b">① ②</span></td></tr>
       <tr><td class="k">R2</td><td class="k">자격증명 확산</td><td>동작시키려고 받은 운영 DB 계정을 코드에 하드코딩, 개인 노트북·Slack 에 잔존</td><td class="c"><span class="tag b">① ③</span></td></tr>
-      <tr><td class="k">R3</td><td class="k">과잉 권한</td><td>“조회만” 만들려던 에이전트가 WMS <b>쓰기 권한</b>까지 가진 계정으로 붙어 있음</td><td class="c"><span class="tag b">③</span></td></tr>
+      <tr><td class="k">R3</td><td class="k">과잉 권한</td><td>“조회만” 만들려던 에이전트가 기간계 <b>쓰기 권한</b>까지 가진 계정으로 붙어 있음</td><td class="c"><span class="tag b">③</span></td></tr>
       <tr><td class="k">R4</td><td class="k">프롬프트 인젝션</td><td>고객 문의 본문에 심어진 지시를 에이전트가 따라 <b>환불 API 를 호출</b></td><td class="c"><span class="tag b">③</span></td></tr>
       <tr><td class="k">R5</td><td class="k">공급망</td><td>모델이 지어낸 없는 패키지명을 설치 → 동명의 악성 패키지가 이미 선점되어 있음</td><td class="c"><span class="tag b">① ④</span></td></tr>
       <tr><td class="k">R6</td><td class="k">유령 에이전트<br>· 비용</td><td>만든 사람이 부서 이동, 아무도 모르는 채 6개월간 돌며 매달 과금</td><td class="c"><span class="tag b">② ④</span></td></tr>
@@ -105,7 +105,7 @@
     <tbody>
       <tr><td class="k">① 작성 환경</td><td>원격 워크스페이스(Coder) + devcontainer + <b>도메인 allowlist</b></td><td>소스·데이터가 개인 PC/외부로 나감, 임의 스크립트 실행</td></tr>
       <tr><td class="k">② AI 게이트웨이</td><td><b>LiteLLM Proxy 자체호스팅</b></td><td>API 키 유출·전용, 비용 폭주, 금지 모델, 무기록 프롬프트</td></tr>
-      <tr><td class="k">③ 도구·데이터 관문</td><td>MCP 게이트웨이 + <b>기존 Keycloak</b> + Vault</td><td>과잉 권한, 인젝션에 의한 도구 오남용, PII 유출</td></tr>
+      <tr><td class="k">③ 도구·데이터 관문</td><td>MCP 게이트웨이 + <b>기존 사내 IdP</b> + Vault</td><td>과잉 권한, 인젝션에 의한 도구 오남용, PII 유출</td></tr>
       <tr><td class="k">④ 승격 게이트</td><td>템플릿 레포 + 자동심사 CI + <b>에이전트 등록부</b></td><td>미검증 코드의 운영 반영, 유령 에이전트, 규제 대응 불가</td></tr>
     </tbody>
   </table>
@@ -123,7 +123,7 @@
       <tr><td class="k">데이터</td><td>합성·마스킹만 <b>(실데이터 금지)</b></td><td>실데이터 <b>읽기 전용</b></td><td>실데이터 (범위 승인)</td></tr>
       <tr><td class="k">쓰기 권한</td><td>없음</td><td>없음</td><td>승인된 API 만, 건별 한도</td></tr>
       <tr><td class="k">승인</td><td><b>없음 (즉시 시작)</b></td><td>팀장 1인</td><td>보안 + 데이터오너 + IT</td></tr>
-      <tr><td class="k">리드타임</td><td class="k" style="color:#15803d">0일</td><td class="k" style="color:#a16207">1일 이내</td><td class="k" style="color:#b91c1c">2주 이내</td></tr>
+      <tr><td class="k">리드타임</td><td class="k" style="color:var(--ok)">0일</td><td class="k" style="color:var(--warn)">1일 이내</td><td class="k" style="color:var(--bad)">2주 이내</td></tr>
     </tbody>
   </table>
   <div class="note"><b>L0 의 리드타임 0일이 이 설계의 핵심이다.</b> 실험 단계에 승인을 걸면 임직원은 개인 ChatGPT 계정으로 도망간다(= 통제 불가능한 섀도 AI). <b>L0 을 충분히 쓸 만하게 만들어 두는 것이 가장 효과적인 보안 대책이다.</b></div>
@@ -132,7 +132,7 @@
 
 <!-- 8 아키텍처 -->
 <section class="slide">
-  <div class="hdr"><span class="no">07</span><h3>레퍼런스 아키텍처</h3><span class="sub">파란색 = 반드시 통과해야 하는 관문</span></div>
+  <div class="hdr"><span class="no">07</span><h3>레퍼런스 아키텍처</h3><span class="sub">진한 보라 = 반드시 통과해야 하는 관문</span></div>
   <div class="fig">{{SVG:s_arch|910}}</div>
   <div class="note" style="margin-top:14px;padding:11px 18px;font-size:15.5px"><b>구축 순서 —</b> ② AI 게이트웨이를 가장 먼저 세운다. 2주 만에 “누가 무엇을 얼마나 쓰는지” 가시성이 생기고, 이후 모든 통제의 기반이 된다.</div>
   <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">8</span></div>
@@ -140,7 +140,7 @@
 
 <!-- 9 권한 상속 -->
 <section class="slide">
-  <div class="hdr"><span class="no">08</span><h3>핵심 설계 — 에이전트는 자기 권한이 없다</h3><span class="sub">Keycloak Token Exchange</span></div>
+  <div class="hdr"><span class="no">08</span><h3>핵심 설계 — 에이전트는 자기 권한이 없다</h3><span class="sub">OAuth 2.0 Token Exchange (RFC 8693)</span></div>
   <div class="two w">
     <div class="fig">{{SVG:s_seq|680}}</div>
     <div>
@@ -148,7 +148,7 @@
       <p class="lead" style="margin-bottom:18px">대신 <b>요청한 사람의 토큰을 교환</b>해 그 사람 권한만큼만 빌려준다. 축소만 가능하고 확대는 불가능하다.</p>
       <ul class="bul">
         <li>인젝션에 당해도 <b>피해 상한이 사용자 권한으로 고정</b>된다</li>
-        <li>운영 중인 <b><code>business</code> 클레임</b>(ITGRIMS/CHEONAN 분리)이 에이전트에도 그대로 적용 — 별도 권한 체계 불필요</li>
+        <li>기존 IdP 의 <b>조직·권한 클레임</b>이 에이전트에도 그대로 적용 — <b>별도 권한 체계를 새로 만들 필요가 없다</b></li>
         <li><b>퇴사자 계정 비활성화 = 에이전트 즉시 무력화.</b> 유령 에이전트 문제의 절반이 자동 해결</li>
       </ul>
     </div>
@@ -162,13 +162,13 @@
   <table class="sm">
     <thead><tr><th style="width:15%">계층</th><th style="width:29%">후보</th><th style="width:23%">권고</th><th>선정 이유</th></tr></thead>
     <tbody>
-      <tr><td class="k">노코드 트랙</td><td>Dify · n8n · Flowise</td><td class="k" style="color:#1d4ed8">Dify 자체호스팅</td><td>RBAC·SSO·감사로그 기본 탑재, 데이터가 사내에 남음</td></tr>
-      <tr><td class="k">코딩 에이전트</td><td>Claude Code · Codex · Gemini CLI</td><td class="k" style="color:#1d4ed8">3사 모두 허용</td><td>도구는 자유, <b>정책은 하나</b> — 같은 게이트웨이·같은 샌드박스 통과</td></tr>
-      <tr><td class="k">작성 샌드박스</td><td>내장 샌드박스 · devcontainer · 원격 워크스페이스 · VM</td><td class="k" style="color:#1d4ed8">devcontainer +<br>원격 워크스페이스</td><td>내장 Bash 샌드박스만으로는 <b>불충분</b>(MCP·훅이 호스트에서 실행됨)</td></tr>
-      <tr><td class="k">런타임 샌드박스</td><td>Docker · <b>gVisor</b> · Firecracker · E2B · Daytona</td><td class="k" style="color:#1d4ed8">gVisor RuntimeClass</td><td>기존 K8s 에 추가만 하면 됨. PII 워크로드가 외부 SaaS 로 안 나감</td></tr>
-      <tr><td class="k">AI 게이트웨이</td><td>LiteLLM · Portkey · Kong · Cloudflare</td><td class="k" style="color:#1d4ed8">LiteLLM 자체호스팅</td><td>100+ 모델, 가상키·예산·팀 관리, 로그가 사내에 남음</td></tr>
-      <tr><td class="k">아이덴티티</td><td>신규 IAM · <b>기존 Keycloak</b></td><td class="k" style="color:#1d4ed8">기존 Keycloak</td><td>새로 살 필요 없음. Token Exchange 로 권한 상속</td></tr>
-      <tr><td class="k">관측·감사</td><td>Langfuse · Phoenix · LangSmith</td><td class="k" style="color:#1d4ed8">Langfuse + OTel</td><td>자체호스팅 가능, 게이트웨이 콜백으로 바로 연동</td></tr>
+      <tr><td class="k">노코드 트랙</td><td>Dify · n8n · Flowise</td><td class="k" style="color:var(--brand)">Dify 자체호스팅</td><td>RBAC·SSO·감사로그 기본 탑재, 데이터가 사내에 남음</td></tr>
+      <tr><td class="k">코딩 에이전트</td><td>Claude Code · Codex · Gemini CLI</td><td class="k" style="color:var(--brand)">3사 모두 허용</td><td>도구는 자유, <b>정책은 하나</b> — 같은 게이트웨이·같은 샌드박스 통과</td></tr>
+      <tr><td class="k">작성 샌드박스</td><td>내장 샌드박스 · devcontainer · 원격 워크스페이스 · VM</td><td class="k" style="color:var(--brand)">devcontainer +<br>원격 워크스페이스</td><td>내장 Bash 샌드박스만으로는 <b>불충분</b>(MCP·훅이 호스트에서 실행됨)</td></tr>
+      <tr><td class="k">런타임 샌드박스</td><td>Docker · <b>gVisor</b> · Firecracker · E2B · Daytona</td><td class="k" style="color:var(--brand)">gVisor RuntimeClass</td><td>기존 K8s 에 추가만 하면 됨. PII 워크로드가 외부 SaaS 로 안 나감</td></tr>
+      <tr><td class="k">AI 게이트웨이</td><td>LiteLLM · Portkey · Kong · Cloudflare</td><td class="k" style="color:var(--brand)">LiteLLM 자체호스팅</td><td>100+ 모델, 가상키·예산·팀 관리, 로그가 사내에 남음</td></tr>
+      <tr><td class="k">아이덴티티</td><td>신규 IAM · <b>기존 사내 IdP</b></td><td class="k" style="color:var(--brand)">기존 사내 IdP</td><td>새로 살 필요 없음. Token Exchange 로 권한 상속</td></tr>
+      <tr><td class="k">관측·감사</td><td>Langfuse · Phoenix · LangSmith</td><td class="k" style="color:var(--brand)">Langfuse + OTel</td><td>자체호스팅 가능, 게이트웨이 콜백으로 바로 연동</td></tr>
     </tbody>
   </table>
   <div class="note" style="font-size:15.5px"><b>이그레스(egress) allowlist 가 샌드박스의 본체다.</b> 파일 격리보다 이쪽이 중요하다. 기본 차단 후 <b>AI 게이트웨이 · 패키지 프록시 · Git · MCP 게이트웨이(모두 사내)</b> 만 연다. 모델 벤더 API 직결도 차단한다.</div>
@@ -181,42 +181,72 @@
   <table class="sm">
     <thead><tr><th style="width:16%"></th><th style="width:26%">안 A · SaaS 최속</th><th style="width:30%">안 B · 자체호스팅 하이브리드</th><th>안 C · 단일 클라우드 통합</th></tr></thead>
     <tbody>
-      <tr><td class="k">구성</td><td>Claude/ChatGPT Enterprise + 매니지드 GW + E2B</td><td>원격 워크스페이스 + LiteLLM + Dify + MCP GW + Keycloak + K8s(gVisor)</td><td>Bedrock AgentCore / Gemini Enterprise / Foundry·Agent365</td></tr>
+      <tr><td class="k">구성</td><td>Claude/ChatGPT Enterprise + 매니지드 GW + E2B</td><td>원격 워크스페이스 + LiteLLM + Dify + MCP GW + 사내 IdP + K8s(gVisor)</td><td>Bedrock AgentCore / Gemini Enterprise / Foundry·Agent365</td></tr>
       <tr><td class="k">기간</td><td>4~6주</td><td class="k">10~14주</td><td>8~12주</td></tr>
       <tr><td class="k">운영 인력</td><td>0.5명</td><td class="k">1.5~2명</td><td>1명</td></tr>
-      <tr><td class="k">데이터 위치</td><td class="neg">상당수 외부</td><td class="k" style="color:#15803d">전량 사내</td><td>해당 클라우드</td></tr>
-      <tr><td class="k">3사 모델 자유</td><td>제한적</td><td class="k" style="color:#15803d">완전 자유</td><td class="neg">제한적 (자사 우선)</td></tr>
-      <tr><td class="k">락인</td><td>벤더별 분산</td><td class="k" style="color:#15803d">낮음</td><td class="neg">높음</td></tr>
-      <tr><td class="k">Keycloak 활용</td><td>부분</td><td class="k" style="color:#15803d">완전</td><td>부분 (IdP 연동만)</td></tr>
+      <tr><td class="k">데이터 위치</td><td class="neg">상당수 외부</td><td class="k" style="color:var(--ok)">전량 사내</td><td>해당 클라우드</td></tr>
+      <tr><td class="k">3사 모델 자유</td><td>제한적</td><td class="k" style="color:var(--ok)">완전 자유</td><td class="neg">제한적 (자사 우선)</td></tr>
+      <tr><td class="k">락인</td><td>벤더별 분산</td><td class="k" style="color:var(--ok)">낮음</td><td class="neg">높음</td></tr>
+      <tr><td class="k">기존 IdP 활용</td><td>부분</td><td class="k" style="color:var(--ok)">완전</td><td>부분 (IdP 연동만)</td></tr>
     </tbody>
   </table>
   <div class="note"><b>권고 — 안 B 로 가되, 안 A 축소판으로 8주 먼저 검증한다.</b> 1단계(0~8주) 합성 데이터만·2개 부서·20명 PoC → 2단계(6~16주) 안 B 골격 구축 → 3단계 이관·확대.
-  <br><b style="color:#b91c1c">1단계에 실데이터를 넣지 않는 것이 조건이다.</b> 지키면 PoC 는 순수한 학습이 되고, 지키지 않으면 되돌릴 수 없는 부채가 된다.</div>
+  <br><b style="color:var(--bad)">1단계에 실데이터를 넣지 않는 것이 조건이다.</b> 지키면 PoC 는 순수한 학습이 되고, 지키지 않으면 되돌릴 수 없는 부채가 된다.</div>
   <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">11</span></div>
 </section>
 
-<!-- 12 로드맵 -->
+<!-- 12 온보딩 전략 -->
 <section class="slide">
-  <div class="hdr"><span class="no">11</span><h3>12주 로드맵</h3><span class="sub">안 B 골격</span></div>
-  <div class="two w" style="align-items:flex-start">
-    <div class="fig">{{SVG:s_gantt|660}}</div>
-    <div>
-      <ul class="bul">
-        <li><b>0~2주 · 준비</b><br>현황조사 · AI 사용정책 초안 · <b>전담조직 구성</b></li>
-        <li><b>2~5주 · 게이트웨이</b> <span class="tag b">효과 즉시</span><br>LiteLLM 구축 → Keycloak 연동 → 모델 allowlist · 예산캡 · 감사로그 · PII 마스킹</li>
-        <li><b>4~9주 · 작성 환경</b><br>devcontainer 표준 · 원격 워크스페이스 파일럿 · 3사 관리형 정책 배포 · Dify</li>
-        <li><b>5~10주 · 도구 관문</b><br>MCP 레지스트리·게이트웨이 · Token Exchange · gVisor</li>
-        <li><b>4~9주 · 공급망</b><br>템플릿 레포 · 승격 게이트 CI · 등록부 검증 · 패키지 프록시</li>
-        <li><b>10~15주 · 확산</b><br>2개 부서 파일럿 · 교육 → 전사 오픈</li>
-      </ul>
-    </div>
+  <div class="hdr"><span class="no">11</span><h3>온보딩 전략 — 첫 성공까지의 거리를 줄인다</h3><span class="sub">플랫폼보다 어려운 부분</span></div>
+  <p class="lead" style="margin-bottom:16px">플랫폼을 깔아도 사람이 안 쓰면 끝난다. 온보딩의 목표는 교육이 아니라 <b>“첫 에이전트가 동작하기까지의 거리”를 줄이는 것</b>이다.</p>
+  <div class="cards" style="margin-bottom:16px">
+    <div class="card"><h4>원칙 1 · 도구 먼저, 교육 나중</h4><p>교육을 선행하면 쓸 곳이 없어 전부 잊는다. <b>로그인 즉시 L0 를 쓸 수 있어야 하고</b>, 교육은 첫 성공 직후에 온다.</p></div>
+    <div class="card"><h4>원칙 2 · 백지에서 시작하지 않게</h4><p>비개발자에게 빈 화면은 벽이다. <b>골든패스 템플릿 10종</b>과 사내 카탈로그에서 <b>복제해 고치는 것</b>이 기본 동선이다.</p></div>
+    <div class="card"><h4>원칙 3 · 확산은 IT 가 아니라 동료가</h4><p>IT 가 전파하면 “또 시키는 일”이 된다. 부서 안의 <b>앰배서더</b>가 만들어 보여줄 때 퍼진다.</p></div>
   </div>
+  <table class="sm">
+    <thead><tr><th style="width:16%">대상</th><th style="width:26%">누구인가</th><th style="width:30%">무엇을 받나</th><th>무엇을 하나</th></tr></thead>
+    <tbody>
+      <tr><td class="k">앰배서더<br>5~10명</td><td>이미 개인 계정으로 AI 를 쓰고 있던 사람 (부서당 1명)</td><td>선행 접근 · 심화 교육 · <b>업무시간 20% 배정</b></td><td>부서 템플릿 생산, 1차 질문 창구</td></tr>
+      <tr><td class="k">얼리 어답터<br>부서당 2~3명</td><td>반복 수작업이 많은 실무자</td><td>90분 워크숍 · L1 교육 우선권</td><td>자기 업무 자동화 → 쇼케이스</td></tr>
+      <tr><td class="k">일반<br>전 임직원</td><td>나머지 전부</td><td><b>L0 즉시 접근</b> · 카탈로그 · 오피스아워</td><td>카탈로그에서 복제해 사용</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>90분 워크숍 커리큘럼 —</b> ① 데이터 등급과 하지 말아야 할 것 <span style="color:var(--mute)">15분</span> &nbsp;②&nbsp;템플릿 복제해 동작시키기 <span style="color:var(--mute)">30분</span> &nbsp;③&nbsp;자기 업무 하나로 직접 만들기 <span style="color:var(--mute)">30분</span> &nbsp;④&nbsp;등록부 작성과 다음 단계 <span style="color:var(--mute)">15분</span> &nbsp;—&nbsp; <b>성공 기준은 “이해했다”가 아니라, 참석자 전원이 동작하는 에이전트 하나를 가지고 나가는 것이다.</b></div>
   <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">12</span></div>
 </section>
 
-<!-- 13 거버넌스 -->
+<!-- 13 온보딩 여정과 측정 -->
 <section class="slide">
-  <div class="hdr"><span class="no">12</span><h3>거버넌스 — 기술이 아닌 부분</h3><span class="sub">없으면 반년 안에 우회당한다</span></div>
+  <div class="hdr"><span class="no">12</span><h3>온보딩 90일 여정과 측정</h3><span class="sub">무엇을 보고 성공을 판단하나</span></div>
+  <div class="fig" style="margin-bottom:12px">{{SVG:s_onboard|940}}</div>
+  <div class="two" style="grid-template-columns:1.25fr .75fr;gap:28px">
+    <table class="sm">
+      <thead><tr><th style="width:26%">지표</th><th style="width:44%">정의</th><th>목표</th></tr></thead>
+      <tbody>
+        <tr><td class="k">TTFA</td><td>첫 로그인 → 첫 에이전트 동작</td><td class="k" style="color:var(--ok)">1일 이내</td></tr>
+        <tr><td class="k">30일 활성률</td><td>30일 내 2개 이상 만든 사람 비율</td><td class="k">40%</td></tr>
+        <tr><td class="k">복제율</td><td>신규 에이전트 중 템플릿·카탈로그 유래</td><td class="k">60%</td></tr>
+        <tr><td class="k">L0 → L1 전환율</td><td>실데이터 연결까지 간 비율</td><td class="k">25%</td></tr>
+        <tr><td class="k">섀도 AI</td><td>개인 계정 사용 (설문 · 네트워크 지표)</td><td class="k" style="color:var(--ok)">분기마다 감소</td></tr>
+      </tbody>
+    </table>
+    <div>
+      <p class="lead" style="font-size:17px;margin-bottom:12px"><b>상시 운영 장치</b></p>
+      <ul class="bul" style="font-size:15.5px">
+        <li><b>주간 오피스아워</b> — 막히는 지점을 플랫폼팀이 직접 관측</li>
+        <li><b>월간 쇼케이스</b> — 인정이 가장 강한 유인</li>
+        <li><b>사내 카탈로그</b> — 남이 만든 것을 복제. 가장 빠른 확산 경로</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note warn"><b>순서를 뒤집으면 실패한다.</b> “교육 이수 후 접근 허용”으로 짜면 대다수가 교육 전에 이탈하고, 그 사이 개인 계정으로 흘러간다. <b>L0 는 무조건 선(先) 개방</b>, 교육은 실데이터를 만지는 L1 진입 조건으로만 건다.</div>
+  <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">13</span></div>
+</section>
+
+<!-- 14 거버넌스 -->
+<section class="slide">
+  <div class="hdr"><span class="no">13</span><h3>거버넌스 — 기술이 아닌 부분</h3><span class="sub">없으면 반년 안에 우회당한다</span></div>
   <div class="cards" style="margin-bottom:20px">
     <div class="card"><h4>에이전트 등록부</h4><p>모든 에이전트가 레포 안 <code>agent.yaml</code> 로 <b>자기 자신을 선언</b>하고 CI 가 검증한다. 선언과 코드가 불일치하면 배포 차단.<br><b>사람이 관리하는 엑셀 대장은 반드시 실패한다.</b></p></div>
     <div class="card"><h4>오너십 · 수명주기</h4><p>오너는 IT 가 아니라 <b>업무 담당 부서</b>. <code>review_due</code> 만료 시 자동 비활성. 90일 무사용 자동 회수. 분기 감사로 등록부 대 실제 배포 대조.</p></div>
@@ -232,12 +262,12 @@
       <tr><td class="k">고영향 AI 판단</td><td>등록부 <code>high_impact_use_case</code> 로 후보 식별 → <b>법무 검토로 확정</b></td></tr>
     </tbody>
   </table>
-  <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">13</span></div>
+  <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">14</span></div>
 </section>
 
-<!-- 14 실패 패턴 -->
+<!-- 15 실패 패턴 -->
 <section class="slide">
-  <div class="hdr"><span class="no">13</span><h3>흔히 실패하는 지점</h3><span class="sub">무너지는 이유는 기술이 아니다</span></div>
+  <div class="hdr"><span class="no">14</span><h3>흔히 실패하는 지점</h3><span class="sub">무너지는 이유는 기술이 아니다</span></div>
   <table class="sm">
     <thead><tr><th style="width:26%">실패 패턴</th><th style="width:32%">결과</th><th>대응</th></tr></thead>
     <tbody>
@@ -249,32 +279,7 @@
       <tr><td class="k">에이전트에<br>고정 계정 부여</td><td class="neg">과잉 권한 + 인젝션 피해 확대</td><td>Token Exchange 로 <b>사용자 권한 상속</b></td></tr>
     </tbody>
   </table>
-  <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">14</span></div>
-</section>
-
-<!-- 15 결정 필요 -->
-<section class="slide">
-  <div class="hdr"><span class="no">14</span><h3>결정이 필요한 사항</h3><span class="sub">Next Step</span></div>
-  <div class="two" style="gap:36px">
-    <div>
-      <p class="lead" style="margin-bottom:14px"><b>제안 구체화를 위해 정해져야 할 것</b></p>
-      <ul class="bul">
-        <li><b>전담 인력</b> — 플랫폼팀 1.5~2명 확보 가능 여부 <span class="tag r">가장 중요</span></li>
-        <li><b>대상 규모</b> — 1차 오픈 인원·부서 <span style="color:#64748b">(20명/2개 부서 권고)</span></li>
-        <li><b>데이터 등급 기준</b> — 반품·배송 데이터 중 어디까지가 PII 이고 어디까지 L1 읽기 허용인지</li>
-        <li><b>인프라 방향</b> — 기존 K8s 재활용 가능 여부, 클라우드/온프렘 구성</li>
-        <li><b>모델 계약</b> — 3사 기업 계약 여부 (학습 미사용·데이터 보존 조건)</li>
-        <li><b>규제 범위</b> — 채용·인사·평가 용도 허용 여부 (고영향 AI 소지)</li>
-      </ul>
-    </div>
-    <div>
-      <p class="lead" style="margin-bottom:14px"><b>결정과 무관하게 지금 착수 가능한 것</b></p>
-      <div class="card" style="margin-bottom:14px"><h4>1. AI 게이트웨이 (2주)</h4><p>LiteLLM 구축 + Keycloak 연동. 어떤 안을 택하든 <b>버려지지 않는 투자</b>이며, 2주 만에 사용 현황 가시성이 생긴다.</p></div>
-      <div class="card" style="margin-bottom:14px"><h4>2. AI 사용 정책 개정</h4><p>“개인 계정으로 사내 데이터를 외부 AI 에 입력 금지” 명문화. <b>단, L0 제공과 동시에</b> 해야 실효가 있다.</p></div>
-      <div class="card"><h4>3. Keycloak 토큰 교환 검증</h4><p>빈 인스턴스에서 Token Exchange 재현. 버전별로 지원 형태가 다르므로 <b>설계 확정 전 확인 필요</b>.</p></div>
-    </div>
-  </div>
-  <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안 &nbsp;·&nbsp; 상세: agent-platform/README.md + reference/ 설정 5종</span><span class="pg">15</span></div>
+  <div class="foot"><span>비개발자 업무 에이전트 개발 플랫폼 구축 제안</span><span class="pg">15</span></div>
 </section>
 
 </body></html>

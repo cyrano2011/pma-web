@@ -5,14 +5,14 @@ flowchart LR
         direction TB
         C1["① 작성 환경<br/>개인 PC 금지<br/>샌드박스 + 이그레스 allowlist"]
         C2["② AI 게이트웨이<br/>모델 키를 아무도 못 가짐<br/>전량 로깅 · 예산 캡"]
-        C3["③ 도구·데이터 관문<br/>MCP 게이트웨이 + Keycloak<br/>에이전트는 사용자 권한만 상속"]
+        C3["③ 도구·데이터 관문<br/>MCP 게이트웨이 + 사내 IdP<br/>에이전트는<br/>사용자 권한만 상속"]
         C4["④ 승격 게이트<br/>운영 반영은<br/>자동 심사 통과분만"]
     end
 
     C1 --> C2 --> C3 --> C4
     C4 --> P["운영 에이전트<br/>(등록부에 등재된 것만)"]
 
-    style C1 fill:#e8f0fe,stroke:#4285f4,color:#202124
-    style C2 fill:#e8f0fe,stroke:#4285f4,color:#202124
-    style C3 fill:#e8f0fe,stroke:#4285f4,color:#202124
-    style C4 fill:#e8f0fe,stroke:#4285f4,color:#202124
+    style C1 fill:#EEF0FE,stroke:#5B4BE8,color:#1E1B4B
+    style C2 fill:#EEF0FE,stroke:#5B4BE8,color:#1E1B4B
+    style C3 fill:#EEF0FE,stroke:#5B4BE8,color:#1E1B4B
+    style C4 fill:#EEF0FE,stroke:#5B4BE8,color:#1E1B4B

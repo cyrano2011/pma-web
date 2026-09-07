@@ -1,7 +1,12 @@
 # 발표자료 빌드
 
-[`../proposal-deck.pdf`](../proposal-deck.pdf) — [제안서 본문](../README.md)을 15장으로 요약한 발표자료(16:9)를 만드는 소스다.
+[`../proposal-deck.pdf`](../proposal-deck.pdf) — **외부 제공용** 발표자료(16:9, 15장)를 만드는 소스다.
 PDF 를 직접 편집하지 말고 여기를 고친 뒤 다시 빌드한다.
+
+> **이 슬라이드는 익명화된 판이다.** [제안서 본문](../README.md)에 있는 고객사 고유정보
+> (IdP realm, 도메인, 조직 클레임값, 기간계 시스템명)는 전부 일반 표현으로 치환되어 있다.
+> 슬라이드를 고칠 때 본문에서 문장을 그대로 옮겨오면 고유정보가 다시 섞여 들어가므로,
+> 빌드 후 `pdftotext` 나 pypdfium2 로 전 페이지 텍스트를 훑어 확인할 것.
 
 ## 구성
 
@@ -10,6 +15,7 @@ PDF 를 직접 편집하지 말고 여기를 고친 뒤 다시 빌드한다.
 | `slides.html` | 슬라이드 15장. 다이어그램 자리는 `{{SVG:이름\|폭px}}` 자리표시자 |
 | `style.css` | 슬라이드 스타일 (1280×720, 표·카드·노트) |
 | `diagrams/*.mmd` | 발표용 mermaid 소스. **문서용 다이어그램과 별개다** — 슬라이드는 더 성기게, 줄바꿈을 손봐서 쓴다 |
+| `style.css` 상단 `:root` | **브랜드 팔레트.** `--brand` 계열 5개만 바꾸면 덱 전체 색이 바뀐다. 다이어그램 색은 `diagrams/*.mmd` 의 `style` 줄과 `mermaid.json` 에 따로 있다 |
 | `mermaid.json` | mermaid 테마 (한글 폰트, 폰트 크기) |
 | `puppeteer.json` · `render.mjs` | Chromium 렌더링 설정과 PDF 출력 |
 | `build.py` | 위를 묶어 `../proposal-deck.pdf` 생성 |

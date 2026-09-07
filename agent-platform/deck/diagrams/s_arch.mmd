@@ -4,11 +4,11 @@ flowchart LR
     W["① 작성 환경<br/>원격 워크스페이스<br/>OS 샌드박스<br/>이그레스 allowlist<br/><br/><b>개인 PC 금지</b>"]
 
     G["② AI 게이트웨이<br/>LiteLLM 자체호스팅<br/><br/>모델 allowlist · 예산 캡<br/>PII 마스킹<br/>전량 감사로그"]
-    T["③ 도구 · 데이터 관문<br/>MCP 게이트웨이<br/><br/>Keycloak 토큰교환<br/>Vault"]
+    T["③ 도구 · 데이터 관문<br/>MCP 게이트웨이<br/><br/>사내 IdP 토큰교환<br/>Vault"]
     D["④ 승격 게이트<br/>템플릿 레포<br/><br/>자동심사 CI<br/>에이전트 등록부"]
 
     M["모델<br/><br/>Anthropic<br/>OpenAI<br/>Google<br/>사내 오픈모델"]
-    S["사내 시스템<br/><br/>WMS · ERP<br/>사내문서<br/>Slack"]
+    S["사내 시스템<br/><br/>기간계 · ERP<br/>사내문서<br/>Slack"]
     O["관측 · 감사<br/><br/>Langfuse / OTel<br/>SIEM<br/>비용 대시보드"]
 
     U --> W
@@ -20,7 +20,7 @@ flowchart LR
     G -.-> O
     T -.-> O
 
-    style G fill:#dbeafe,stroke:#2563eb,stroke-width:3px,color:#0f172a
-    style T fill:#dbeafe,stroke:#2563eb,stroke-width:3px,color:#0f172a
-    style W fill:#eff6ff,stroke:#60a5fa,stroke-width:2px,color:#0f172a
-    style D fill:#eff6ff,stroke:#60a5fa,stroke-width:2px,color:#0f172a
+    style G fill:#E0DDFB,stroke:#5B4BE8,stroke-width:3px,color:#1E1B4B
+    style T fill:#E0DDFB,stroke:#5B4BE8,stroke-width:3px,color:#1E1B4B
+    style W fill:#F1EFFE,stroke:#9B90F0,stroke-width:2px,color:#1E1B4B
+    style D fill:#F1EFFE,stroke:#9B90F0,stroke-width:2px,color:#1E1B4B

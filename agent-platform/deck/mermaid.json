@@ -4,23 +4,37 @@
   "themeVariables": {
     "fontFamily": "Noto Sans CJK KR, sans-serif",
     "fontSize": "19px",
-    "primaryColor": "#eef2f7",
-    "primaryTextColor": "#0f172a",
-    "primaryBorderColor": "#94a3b8",
-    "lineColor": "#64748b",
-    "secondaryColor": "#f1f5f9",
-    "tertiaryColor": "#f8fafc",
-    "actorBkg": "#eef2f7",
-    "actorTextColor": "#0f172a",
-    "actorLineColor": "#94a3b8",
-    "signalColor": "#334155",
-    "signalTextColor": "#0f172a",
-    "noteBkgColor": "#fef9c3",
-    "noteTextColor": "#0f172a",
-    "clusterBkg": "#f8fafc",
-    "clusterBorder": "#cbd5e1"
+    "primaryColor": "#EEF0FE",
+    "primaryTextColor": "#1E1B4B",
+    "primaryBorderColor": "#A5A0E5",
+    "lineColor": "#6F69B8",
+    "secondaryColor": "#F4F3FE",
+    "tertiaryColor": "#FAFAFE",
+    "actorBkg": "#EEF0FE",
+    "actorTextColor": "#1E1B4B",
+    "actorLineColor": "#A5A0E5",
+    "signalColor": "#3B3670",
+    "signalTextColor": "#1E1B4B",
+    "noteBkgColor": "#F5F0DC",
+    "noteTextColor": "#1E1B4B",
+    "clusterBkg": "#FAFAFE",
+    "clusterBorder": "#C7C2F5"
   },
-  "flowchart": { "curve": "basis", "nodeSpacing": 40, "rankSpacing": 45, "padding": 12 },
-  "sequence": { "actorFontSize": 19, "noteFontSize": 16, "messageFontSize": 18, "width": 175 },
-  "gantt": { "fontSize": 15, "barHeight": 18, "sectionFontSize": 16 }
+  "flowchart": {
+    "curve": "basis",
+    "nodeSpacing": 40,
+    "rankSpacing": 45,
+    "padding": 12
+  },
+  "sequence": {
+    "actorFontSize": 19,
+    "noteFontSize": 16,
+    "messageFontSize": 18,
+    "width": 175
+  },
+  "gantt": {
+    "fontSize": 15,
+    "barHeight": 18,
+    "sectionFontSize": 16
+  }
 }

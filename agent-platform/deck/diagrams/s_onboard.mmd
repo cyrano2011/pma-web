@@ -1,0 +1,14 @@
+flowchart LR
+    D0["<b>Day 0</b><br/>계정 발급<br/><br/>SSO 로그인만으로<br/>L0 워크스페이스<br/>자동 생성<br/><b>신청 · 승인 없음</b>"]
+    D1["<b>Day 1</b><br/>90분 워크숍<br/><br/>자기 업무 하나를 골라<br/>그 자리에서 1개 완성<br/><b>첫 성공 경험</b>"]
+    W1["<b>Week 1~2</b><br/>복제 · 변형<br/><br/>템플릿 10종 ·<br/>사내 카탈로그에서<br/>가져다 고쳐 쓴다"]
+    W3["<b>Week 3~4</b><br/>L1 승격<br/><br/>교육 이수 →<br/>읽기 전용 실데이터<br/>연결"]
+    M2["<b>Month 2~3</b><br/>부서 확산<br/><br/>쇼케이스 ·<br/>운영 승격 후보 선별"]
+
+    D0 --> D1 --> W1 --> W3 --> M2
+
+    style D0 fill:#EEF0FE,stroke:#5B4BE8,stroke-width:2px,color:#1E1B4B
+    style D1 fill:#E0DDFB,stroke:#5B4BE8,stroke-width:3px,color:#1E1B4B
+    style W1 fill:#F1EFFE,stroke:#9B90F0,color:#1E1B4B
+    style W3 fill:#F1EFFE,stroke:#9B90F0,color:#1E1B4B
+    style M2 fill:#F1EFFE,stroke:#9B90F0,color:#1E1B4B
